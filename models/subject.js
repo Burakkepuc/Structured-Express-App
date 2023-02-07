@@ -8,7 +8,7 @@ module.exports = (sequelize, DataTypes) => {
      * The `models/index` file will call this method automatically.
      */
     static associate(models) {
-      // this.belongsTo(models.Instructor);
+      Subject.hasOne(models.Instructor, {foreignKey: 'subjectId'});
     }
   }
   Subject.init(

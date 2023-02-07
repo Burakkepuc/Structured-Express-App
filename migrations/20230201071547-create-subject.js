@@ -16,13 +16,6 @@ module.exports = {
         allowNull: false,
         type: Sequelize.DATE,
       },
-      subjectId: {
-        type: Sequelize.INTEGER,
-        references: {
-          model: 'Instructor',
-          key: 'id',
-        },
-      },
       updatedAt: {
         allowNull: false,
         type: Sequelize.DATE,

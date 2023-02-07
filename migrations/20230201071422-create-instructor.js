@@ -20,6 +20,10 @@ module.exports = {
       },
       subjectId: {
         type: Sequelize.INTEGER,
+        references: {
+          model: 'Subject',
+          key: 'id',
+        },
       },
       createdAt: {
         allowNull: false,
