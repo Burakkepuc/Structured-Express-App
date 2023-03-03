@@ -1,12 +1,9 @@
-const express = require('express');
+import express from 'express';
+import {Student} from '../src/models'
+
 const app = express();
 const expressSwagger = require('express-swagger-generator')(app);
-
 const port = 5000;
-const {
-  sequelize,
-  Student,
-} = require('./models');
 
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
@@ -155,7 +152,5 @@ app.delete('/student/:id', async(req,res) => {
 })
 
 app.listen(port, async () => {
-  console.log(`Example app listening on port ${port}`);
-  await sequelize.sync({alter: true});
-  console.log('Database connected');
+  console.log(`Express server listening port ${port}`);
 });
