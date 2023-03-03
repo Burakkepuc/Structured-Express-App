@@ -15,6 +15,7 @@ module.exports = (sequelize, DataTypes) => {
       });
     }
   }
+
   Class.init(
     {
       instructorId: DataTypes.INTEGER,

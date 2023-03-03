@@ -1,16 +1,11 @@
 const express = require('express');
 const app = express();
 const expressSwagger = require('express-swagger-generator')(app);
-const swaggerUi = require('swagger-ui-express');
 
-const port = 3000;
+const port = 5000;
 const {
   sequelize,
   Student,
-  Instructor,
-  Subject,
-  Class,
-  StudentClass,
 } = require('./models');
 
 app.use(express.json());
@@ -24,7 +19,7 @@ let options = {
       title: 'School Management simulation',
       version: '1.0.0',
     },
-    host: 'localhost:3000',
+    host: 'localhost:5000',
     basePath: '/',
     produces: ['application/json', 'application/xml'],
     schemas: ['http', 'https'],
@@ -42,146 +37,122 @@ let options = {
   files: ['./app.js'],
 };
 expressSwagger(options);
-app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(options));
-
-/**
- * @swagger
- * @group Students - Operations About Student
- * @route POST /student - Add a new student
- * @summary endpoint for adding a student
- * @param {string} name.required - Student name
- * @param {string} surname.required - Student surname
- * @param {string} email.required - Student email
- * @produces application/json
- * @consumes application/json
- * @returns {Students} 200 - Student Model
- * @security JWT
- */
-
-app.post('/student', async (req, res) => {
-  try {
-    const {name, surname, email} = req.body;
-    const student = await Student.create({name, surname, email});
-    return res.json(student);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-});
-
-/**
- * @swagger
- * @group Instructors
- * @route POST /instructor - Add a new instructor
- * @summary endpoint for adding a instructor
- * @param {string} instructorDegree.required - Instructor degree
- * @param {string} name.required - Instructor name
- * @param {string} surname.required - Instructor surname
- * @param {string} subjectId.required - Instructor email
- * @produces application/json
- * @consumes application/json
- * @returns {Instructor} 200 - Instructor Model
- * @security JWT
- */
-
-app.post('/instructor', async (req, res) => {
-  try {
-    console.log(req.body);
-
-    const {instructorDegree, name, surname, subjectId} = req.body;
-    const instructor = await Instructor.create({
-      instructorDegree,
-      name,
-      surname,
-      subjectId,
-    });
-    return res.json(instructor);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-});
-
-app.post('/subjects', async (req, res) => {
-  try {
-    const {subjectName, instructorId} = req.body;
-    const subject = await Subject.create({
-      subjectName,
-      instructorId,
-    });
-    return res.json(subject);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-});
-
-app.post('/classes', async (req, res) => {
-  try {
-    const {instructorId, classCode} = req.body;
-    const savedClass = await Class.create({
-      instructorId,
-      classCode,
-    });
-    return res.json(savedClass);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-});
-
-app.post('/student_classes', async (req, res) => {
-  try {
-    const {classId, studentId} = req.body;
-    const saveClassesandStudents = await StudentClass.create({
-      classId,
-      studentId,
-    });
-
-    return res.json(saveClassesandStudents);
-  } catch (error) {
-    console.log(error);
-    return res.status(500).json(error);
-  }
-});
 
 /**
  * @swagger
  * @route GET /students
- * @summary endpoint for getting all students
  * @group Students
- * @returns {array} 200 - An array of students info
+ * @summary endpoint for getting all students
+ * @returns {object} 200 - An array of students info
  * @returns {Error} 500 - Internal server error
- *
- * @typedef Student
- *
  */
 app.get('/students', async (req, res) => {
   try {
     const students = await Student.findAll();
     res.json(students);
   } catch (error) {
-    return res.status(500).json({error: 'Something went wrong'});
+    return res.status(500).json({error: error.message});
   }
 });
 
 /**
  * @swagger
- * @route GET /instructors
- * @summary endpoind for getting all instructors
- * @group Instructors - Operations About instructors
- * @returns {array} 200 - An array of students info
+ * @route GET /student/{id}
+ * @group Students
+ * @summary endpoint for getting one student
+ * @param {string} id.path.required - ID
+ * @returns {object} 200 - An array of students info
  * @returns {Error} 500 - Internal server error
  */
-app.get('/instructors', async (req, res) => {
+app.get('/student/:id',async (req,res) => {
+ try {
+   const {id} = req.params; 
+   const student = await Student.findOne({where:{id:id}})
+  res.json(student)
+ } catch (error) {
+    return res.status(500).json({error: error.message});
+ }
+})
+
+/**
+ * @typedef Student
+ * @property {string} name.required
+ * @property {string} surname.required
+ * @property {string} email.required
+ */
+/**
+ * @swagger
+ * @typedef Student
+ * @route POST /student
+ * @group Students - Post operation about student
+ * @summary endpoint for adding a student
+ * @param {Student.model} Student.body.required
+ * @returns {object} 200 - Student Model
+ * @returns {Error} 500 - Internal server error
+ */
+app.post('/student', async (req, res) => {
   try {
-    const instructors = await Instructor.findAll({include: ['Subject']});
-    return res.json(instructors);
-  } catch (err) {
-    console.log(err);
-    res.status(500).json(err);
+    const {name, surname, email} = req.body;
+    const student = await Student.create({name, surname, email});
+    return res.json(student);
+  } catch (error) {
+    return res.status(500).json({error: error.message});
   }
 });
+
+/**
+ * @typedef Student
+ * @property {string} name
+ * @property {string} surname
+ * @property {string} email
+ */
+/**
+ * @swagger
+ * @typedef Student
+ * @route PUT /student/{id}
+ * @group Students - Put operation about student
+ * @summary Updating a user
+ * @param {string} id.path.required - ID
+ * @param {Student.model} Student.body.required
+ * @returns {object} 200 - Student Model
+ * @returns {Error} 500 - Internal server error
+ */
+app.put('/student/:id',async(req,res) => {
+  try {
+    const {id} = req.params;
+    const findStudent = await Student.findOne({where:{id:id}})
+    if(!findStudent){
+				return {type: false, message: 'Student could not find'};
+    }
+    const student = await Student.update(req.body,{where:{id:id}})
+    return res.json(student)
+  } catch (error) {
+    return res.status(500).json({error: error.message});
+  }
+})
+
+/**
+ * @swagger
+ * @route DELETE /student/{id}
+ * @group Students - Delete operation about a student
+ * @summary Deleting a student from database
+ * @param {string} id.path.required - ID
+ * @returns {object} 200 - An array of user info
+ * @returns {Error} 500 - Internal server error
+ */
+app.delete('/student/:id', async(req,res) => {
+  try {
+    const {id} = req.params;
+    const findStudent = await Student.findOne({where:{id:id}})
+    if(!findStudent){
+				return {type: false, message: 'Student could not find'};
+    }
+    const student = await findStudent.destroy()
+    return res.json(student)
+  } catch (error) {
+    return res.status(500).json({error: error.message});
+  }
+})
 
 app.listen(port, async () => {
   console.log(`Example app listening on port ${port}`);
