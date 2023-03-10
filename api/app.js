@@ -1,5 +1,7 @@
 import express from 'express';
 import {Student} from '../src/models'
+import options from '../src/config/swaggerOptions';
+import routes from '../api/Routes';
 
 const app = express();
 const expressSwagger = require('express-swagger-generator')(app);
@@ -8,68 +10,11 @@ const port = 5000;
 app.use(express.json());
 app.use(express.urlencoded({extended: true}));
 
-// Swagger settings
-let options = {
-  swaggerDefinition: {
-    info: {
-      description: 'This is a server with basic API features',
-      title: 'School Management simulation',
-      version: '1.0.0',
-    },
-    host: 'localhost:5000',
-    basePath: '/',
-    produces: ['application/json', 'application/xml'],
-    schemas: ['http', 'https'],
-    securityDefinition: {
-      JWT: {
-        type: 'apiKey',
-        in: 'header',
-        name: 'Authorization',
-        description: '',
-      },
-    },
-  },
+app.use('/',routes)
 
-  basedir: __dirname,
-  files: ['./app.js'],
-};
 expressSwagger(options);
 
-/**
- * @swagger
- * @route GET /students
- * @group Students
- * @summary endpoint for getting all students
- * @returns {object} 200 - An array of students info
- * @returns {Error} 500 - Internal server error
- */
-app.get('/students', async (req, res) => {
-  try {
-    const students = await Student.findAll();
-    res.json(students);
-  } catch (error) {
-    return res.status(500).json({error: error.message});
-  }
-});
 
-/**
- * @swagger
- * @route GET /student/{id}
- * @group Students
- * @summary endpoint for getting one student
- * @param {string} id.path.required - ID
- * @returns {object} 200 - An array of students info
- * @returns {Error} 500 - Internal server error
- */
-app.get('/student/:id',async (req,res) => {
- try {
-   const {id} = req.params; 
-   const student = await Student.findOne({where:{id:id}})
-  res.json(student)
- } catch (error) {
-    return res.status(500).json({error: error.message});
- }
-})
 
 /**
  * @typedef Student
