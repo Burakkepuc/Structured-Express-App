@@ -7,6 +7,7 @@ fs.readdir('./api/Routes', (err,files) => {
     console.log(err);
   }else{
   files.forEach((file) => {
+    //  Do not read the index !!
     if(file.indexOf('index.js') !== -1) return;
     const routeName = file.slice(0,-3).toLowerCase();
     const route = require(`../Routes/${routeName}`);
