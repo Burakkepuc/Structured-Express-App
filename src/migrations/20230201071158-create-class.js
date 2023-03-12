@@ -12,7 +12,7 @@ module.exports = {
       instructorId: {
         type: Sequelize.INTEGER,
         references: {
-          model: 'Instructors',
+          model: 'Instructor',
           key: 'id',
         },
       },
