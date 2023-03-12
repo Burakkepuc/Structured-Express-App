@@ -1,14 +1,13 @@
-import express from 'express'
-import StudentControllers from '../Controllers/Student'
+import express from 'express';
+import StudentControllers from '../Controllers/Student';
 
-const router = express.Router()
+// eslint-disable-next-line new-cap
+const router = express.Router();
 
-router.get('/', StudentControllers.getAll)
-router.get('/:id', StudentControllers.getOne)
-router.post('/', StudentControllers.create)
-router.put('/:id', StudentControllers.update)
-router.delete('/:id', StudentControllers.delete)
+router.get('/', StudentControllers.getAll);
+router.get('/:id', StudentControllers.getOne);
+router.post('/', StudentControllers.create);
+router.put('/:id', StudentControllers.update);
+router.delete('/:id', StudentControllers.delete);
 
-
-
-module.exports = router
+module.exports = router;
